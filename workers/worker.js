@@ -10,24 +10,26 @@ self.onmessage = event => {
 	const workerName = event.data.workerName;
 	const items = event.data.items;
 	const firstAlgorithmOnQueue = event.data.algorithm;
+	const searchValue = event.data.searchValue
+	
 	let result = null;
 
 	const startTime = Date.now();
 	switch (firstAlgorithmOnQueue) {
 		case 'binary':
-			result = binarySearch(items, 440547);
+			result = binarySearch(items, searchValue);
 			break;
 		case 'exponential':
-			result = exponentialSearch(items, 440547);
+			result = exponentialSearch(items, searchValue);
 			break;
 		case 'interpolation':
-			result = interpolationSearch(items, 440547);
+			result = interpolationSearch(items, searchValue);
 			break;
 		case 'jump':
-			result = jumpSearch(items, 440547);
+			result = jumpSearch(items, searchValue);
 			break;
 		case 'sequential':
-			result = sequentialSearch(items, 440547);
+			result = sequentialSearch(items, searchValue);
 			break;
 	}
 	const duration = (Date.now() - startTime);
