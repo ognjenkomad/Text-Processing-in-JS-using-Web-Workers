@@ -10,6 +10,7 @@ self.onmessage = event => {
 	const workerName = event.data.workerName;
 	const items = event.data.items;
 	const firstAlgorithmOnQueue = event.data.algorithm;
+  let result = null;
 
 	const startTime = Date.now();
 	switch (firstAlgorithmOnQueue) {
@@ -23,10 +24,12 @@ self.onmessage = event => {
 			interpolationSearch(items, 4283);
 			break;
 		case 'jump':
-			jumpSearch(items, 4283);
+			result = jumpSearch(items, 4283);
+			console.log(result);
 			break;
 		case 'sequential':
-			sequentialSearch(items, 4283);
+			result = sequentialSearch(items, 440547);
+			console.log(result);
 			break;
 	}
 	const duration = (Date.now() - startTime);

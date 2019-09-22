@@ -15,7 +15,7 @@ let searchAlgorithms = [
 	// // 'binary',
 	// // 'exponential', 
 	// 'interpolation', 
-	// // 'jump',
+	// 'jump',
 	'sequential'
 ];
 
