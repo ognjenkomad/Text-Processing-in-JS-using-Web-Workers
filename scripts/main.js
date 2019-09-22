@@ -1,4 +1,4 @@
-const runWorker = (worker, workerName) => {
+const runWorker = (worker, workerName, items) => {
 	let algorithm = searchAlgorithms.pop();
 	worker.postMessage({ items, algorithm, workerName});
 	worker.onmessage = event => {
@@ -12,17 +12,15 @@ const runWorker = (worker, workerName) => {
 };
 
 let searchAlgorithms = [
-	'one',
-	'two',
-	'three',
-	'four',
-	'five'
+	// // 'binary',
+	// // 'exponential', 
+	// 'interpolation', 
+	// // 'jump',
+	'sequential'
 ];
 
-let items = [1, 2, 3, 4];
-
 const worker1 = new Worker('../workers/worker.js?name=Worker1');
-const worker2 = new Worker('../workers/worker.js?name=Worker2');
+// const worker2 = new Worker('../workers/worker.js?name=Worker2');
 
-runWorker(worker1, 'worker_1');
-runWorker(worker2, 'worker_2');
+runWorker(worker1, 'worker_1', data.integers);
+// runWorker(worker2, 'worker_2', data.integers);

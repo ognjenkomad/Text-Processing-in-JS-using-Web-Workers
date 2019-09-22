@@ -1,2 +1,8 @@
-export default sequential = (items, searchValue) => items.find(value => value === searchValue)
+sequentialSearch = (arrayToSearch, valueToSearch) =>  {
+  for (var i=0; i<arrayToSearch.length; i++) {
+    if (arrayToSearch[i] == valueToSearch) {
+      return i;
+    }
+  } return null;
+}
 

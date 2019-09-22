@@ -1,3 +1,11 @@
+self.importScripts(
+	'../search-algorithms/binary.js',
+	'../search-algorithms/exponential.js', 
+	'../search-algorithms/interpolation.js', 
+	'../search-algorithms/jump.js',
+	'../search-algorithms/sequential.js'
+	)
+
 self.onmessage = event => {
 	const workerName = event.data.workerName;
 	const items = event.data.items;
@@ -5,24 +13,24 @@ self.onmessage = event => {
 
 	const startTime = Date.now();
 	switch (firstAlgorithmOnQueue) {
-		case 'one':
-			one(items);
+		case 'binary':
+			binarySearch(items, 4283);
 			break;
-		case 'two':
-			two(items);
+		case 'exponential':
+			exponentialSearch(items, 4283);
 			break;
-		case 'three':
-			three(items);
+		case 'interpolation':
+			interpolationSearch(items, 4283);
 			break;
-		case 'four':
-			four(items);
+		case 'jump':
+			jumpSearch(items, 4283);
 			break;
-		case 'five':
-			five(items);
+		case 'sequential':
+			sequentialSearch(items, 4283);
 			break;
 	}
-	const duration = (Date.now() - startTime) / 1000;
-	console.log(`Worker finished: function ${firstAlgorithmOnQueue.toUpperCase()} | worker ${workerName.toUpperCase()} | duration: ${duration} s`);
+	const duration = (Date.now() - startTime);
+	console.log(`Worker finished: function ${firstAlgorithmOnQueue.toUpperCase()} | worker ${workerName.toUpperCase()} | duration: ${duration} ms`);
 	self.postMessage(firstAlgorithmOnQueue);
 };
 

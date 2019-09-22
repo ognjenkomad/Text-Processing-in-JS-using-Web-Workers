@@ -1,23 +1,17 @@
-function binarySearch(myList, itemToFind) {
-	var low = 0,
-        high = myList.length - 1,
-        mid,
-        guessed;
-
-	while(low <= high) {
-	    mid = Math.floor((low + high) / 2),
-	    guessed = myList[mid];
-
-	    if(guessed === itemToFind) {
-                console.log('Found item at index: ' + mid + ', value is ' + guessed);
-		    return;
-	    }
-	    if(itemToFind < guessed) {
-	        high = mid - 1;
-            } else {
-	        low = mid + 1;
-	    }
-        }
-
-	return null;
+function binarySearch(arrayToSearch, valueToSearch){
+	let start = 0;
+	let end = arrayToSearch.length - 1;
+  if(start <= end){
+    var middle = Math.ceil((end + start)/2)
+    var middleValue = arrayToSearch[middle];
+    if(middleValue === valueToSearch){
+      return middle;
+    } else if(valueToSearch < middleValue){
+        end = middle - 1;
+    } else{
+        start = middle + 1;
+    }
+    return binarySearch(arrayToSearch, valueToSearch, start, end);
+  }
+  return -1;
 }
