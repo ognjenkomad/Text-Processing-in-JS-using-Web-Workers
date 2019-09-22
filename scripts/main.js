@@ -12,15 +12,15 @@ const runWorker = (worker, workerName, items) => {
 };
 
 let searchAlgorithms = [
-	// 'binary',
+	'binary',
 	'exponential', 
-	// 'interpolation', 
-	// 'jump',
-	// 'sequential'
+	'interpolation',
+	'jump',
+	'sequential'
 ];
 
 const worker1 = new Worker('../workers/worker.js?name=Worker1');
-// const worker2 = new Worker('../workers/worker.js?name=Worker2');
+const worker2 = new Worker('../workers/worker.js?name=Worker2');
 
 runWorker(worker1, 'worker_1', data.integers);
-// runWorker(worker2, 'worker_2', data.integers);
+runWorker(worker2, 'worker_2', data.integers);
