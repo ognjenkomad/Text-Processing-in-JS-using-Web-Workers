@@ -12,11 +12,11 @@ const runWorker = (worker, workerName, items) => {
 };
 
 let searchAlgorithms = [
-	// // 'binary',
-	// // 'exponential', 
+	// 'binary',
+	'exponential', 
 	// 'interpolation', 
 	// 'jump',
-	'sequential'
+	// 'sequential'
 ];
 
 const worker1 = new Worker('../workers/worker.js?name=Worker1');

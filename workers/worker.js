@@ -15,10 +15,13 @@ self.onmessage = event => {
 	const startTime = Date.now();
 	switch (firstAlgorithmOnQueue) {
 		case 'binary':
-			binarySearch(items, 4283);
+			result = binarySearch(items, 440547);
+			console.log(">>>> t", result);
+			
 			break;
 		case 'exponential':
-			exponentialSearch(items, 4283);
+			result = exponentialSearch(items, 440547);
+			console.log(">>>> t", result);
 			break;
 		case 'interpolation':
 			interpolationSearch(items, 4283);

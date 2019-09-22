@@ -1,7 +1,5 @@
 // TODO IMPORT BINARY SEARCH
-function binary(arrayToSearch, valueToSearch){
-	let start = 0;
-	let end = arrayToSearch.length - 1;
+function binary(arrayToSearch, valueToSearch, start = 0, end = arrayToSearch){
   if(start <= end){
     var middle = Math.ceil((end + start)/2)
     var middleValue = arrayToSearch[middle];
@@ -17,8 +15,7 @@ function binary(arrayToSearch, valueToSearch){
   return -1;
 }
 
-function exponentialSearch(arrayToSearch, valueToSearch){
-  let length = arrayToSearch.length
+function exponentialSearch(arrayToSearch, valueToSearch, length = arrayToSearch.length - 1){
   if (arrayToSearch[0] == valueToSearch){
       return 0;
   }
