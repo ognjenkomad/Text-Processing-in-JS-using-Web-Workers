@@ -2,7 +2,7 @@ function jumpSearch(arrayToSearch, valueToSearch) {
 	let length = arrayToSearch.length;
 	let step = Math.floor(Math.sqrt(length));
 	let lowerBound = 0;
-	while (arrayToSearch[Math.min(step, length) - 1] < valueToSearch) {
+	while (Math.min(step, length) - 1 < valueToSearch) {
 		lowerBound = step;
 		step += step;
 		if (lowerBound >= length) {
@@ -11,14 +11,14 @@ function jumpSearch(arrayToSearch, valueToSearch) {
 	}
 
 	let upperBound = Math.min(step, length);
-	while (arrayToSearch[lowerBound] < valueToSearch) {
+	while (lowerBound < valueToSearch) {
 		lowerBound++;
 		if (lowerBound === upperBound) {
 			return -1;
 		}
 	}
-	if (arrayToSearch[lowerBound] === valueToSearch) {
-		return lowerBound;
+	if (lowerBound === valueToSearch) {
+		return arrayToSearch[lowerBound];
 	}
 	return -1;
 }

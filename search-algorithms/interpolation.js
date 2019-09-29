@@ -1,14 +1,14 @@
 function interpolationSearch(arrayToSearch, valueToSearch, low = 0, high = arrayToSearch.length - 1) {
 	if (low <= high
-		&& valueToSearch >= arrayToSearch[low]
-		&& valueToSearch <= arrayToSearch[high]
+		&& valueToSearch >= low
+		&& valueToSearch <= high
 	) {
-		let delta = (valueToSearch - arrayToSearch[low]) / (arrayToSearch[high] - arrayToSearch[low]);
+		let delta = (valueToSearch - low) / (high - low);
 		let position = low + Math.floor((high - low) * delta);
-		if (arrayToSearch[position] === valueToSearch) {
-			return arrayToSearch.indexOf(valueToSearch);
+		if (position === valueToSearch) {
+			return arrayToSearch[position];
 		}
-		if (arrayToSearch[position] < valueToSearch) {
+		if (position < valueToSearch) {
 			low = position + 1;
 		} else {
 			high = position - 1;

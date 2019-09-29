@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Web Workers</title>
         <script type="text/javascript" src='./data/data.json'></script>
-        <script src="./scripts/main.js"></script>
     </head>
     <body>
-        <input type="number" id='search-value' name="searchValue" placeholder="Please type number...">
+        <input type="number" id='search-value' name="searchValue" placeholder="Search students by index...">
         <button id="submit-button" onclick="findNumber()">Find number index</button>
+        <ul id="result">
+        </ul>
+        <script src="./scripts/main.js"></script>
     </body>
 </html>
