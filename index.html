@@ -1,14 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Web Workers</title>
-        <script type="text/javascript" src='./data/data.json'></script>
-    </head>
-    <body>
-        <input type="number" id='search-value' name="searchValue" placeholder="Search students by index...">
-        <button id="submit-button" onclick="findNumber()">Find number index</button>
-        <ul id="result">
-        </ul>
-        <script src="./scripts/main.js"></script>
-    </body>
+
+<head>
+    <title>Web Workers</title>
+    <script type="text/javascript" src='./data/data.json'></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container-fluid my-3">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="input-group mb-3">
+                    <input type="number" min="0" class="form-control" id='search-input' name="searchValue"
+                        placeholder="Search students by id...">
+                    <div class="input-group-append">
+                        <button id="submit-button" class="btn btn-outline-primary" type="button">Search</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <table id="result-table" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Worker</th>
+                                    <th scope="col">Algorithm</th>
+                                    <th scope="col">Time</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">First Name</th>
+                                    <th scope="col">Last Name</th>
+                                    <th scope="col">Birth Place</th>
+                                    <th scope="col">Age</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="processing-select">Processing Type</label>
+                            </div>
+                            <select class="custom-select" id="processing-select">
+                                <option selected value="1">Sequential</option>
+                                <option value="2">Parallel</option>
+                            </select>
+                        </div>
+
+                        <div style="display: none" class="input-group mb-3" id="worker-select-container">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="worker-select">Number of Workers</label>
+                            </div>
+                            <select class="custom-select" id="worker-select">
+                                <option selected value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="./search-algorithms/binary.js"></script>
+    <script src="./search-algorithms/exponential.js"></script>
+    <script src="./search-algorithms/interpolation.js"></script>
+    <script src="./search-algorithms/jump.js"></script>
+    <script src="./search-algorithms/sequential.js"></script>
+    <script src="./scripts/main.js"></script>
+</body>
+
 </html>
