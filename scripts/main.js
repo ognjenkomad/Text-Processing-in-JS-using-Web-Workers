@@ -17,6 +17,9 @@ const searchAlgorithms = [
 		'jump',
 		'sequential'
 ];
+
+let finishedAlgorithmsCount = 0;
+let totalTimeStart = 0;
 let algorithmsQueue = [];
 
 // Events
@@ -36,6 +39,7 @@ processingSelect.on('change', (event) => {
 
 
 function findNumber() {
+	totalTimeStart = Date.now()
 	algorithmsQueue = [...searchAlgorithms];
 	resultTable.find('tbody').empty()
 	const searchValue = parseInt(searchInput.val());
@@ -46,15 +50,8 @@ function findNumber() {
 			runWorker(worker, `worker_${i}`, students, searchValue);
 		}
 	} else {
-		const startTime = Date.now()
 		runAllAlgorithmsSequenital(students, searchValue)
-		const duration = Date.now() - startTime
-		tableFooter.empty()
-		tableFooter.append(`
-			<tr class="table-primary">
-				<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
-			</tr>
-		`)
+		appendTableFooter()
 	}
 }
 
@@ -68,6 +65,17 @@ function logAlgorithmResult(resultData) {
 	} else {
 		appendResultData(workerName, algorithm, duration, result)
 	}
+}
+
+const appendTableFooter = () => {
+	const duration = Date.now() - totalTimeStart
+
+	tableFooter.empty()
+	tableFooter.append(`
+		<tr class="table-primary">
+			<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
+		</tr>
+	`)
 }
 
 const appendNoDataFound = (workerName, algorithm, duration) => {
@@ -108,7 +116,11 @@ const runAllAlgorithmsSequenital = (items, searchValue) => {
 const runWorker = (worker, workerName, items, searchValue) => {
 	let algorithm = algorithmsQueue.pop();
 	worker.postMessage({ items, algorithm, workerName, searchValue});
-	worker.onmessage = event => {
+	worker.onmessage = event => {		
+		finishedAlgorithmsCount ++;
+		if (finishedAlgorithmsCount === 5) {
+			appendTableFooter()
+		}
 		logAlgorithmResult(event.data);
 		if (algorithmsQueue.length === 0) {
 			//worker.terminate();
