@@ -1,6 +1,9 @@
-const resultTableBody = $('#result-table')
+const resultTable = $('#result-table')
+const tableFooter = resultTable.find('tfoot')
+
 const submitButton = $('#submit-button')
 const searchInput = $('#search-input')
+
 const processingSelect = $('#processing-select')
 const workerSelectContainer = $('#worker-select-container')
 const workerSelect = $('#worker-select')
@@ -34,7 +37,7 @@ processingSelect.on('change', (event) => {
 
 function findNumber() {
 	algorithmsQueue = [...searchAlgorithms];
-	resultTableBody.find('tbody').empty()
+	resultTable.find('tbody').empty()
 	const searchValue = parseInt(searchInput.val());
 	if (processingSelect.val() == 2) {
 		numberOfWorkers = workerSelect.val()
@@ -43,7 +46,15 @@ function findNumber() {
 			runWorker(worker, `worker_${i}`, students, searchValue);
 		}
 	} else {
+		const startTime = Date.now()
 		runAllAlgorithmsSequenital(students, searchValue)
+		const duration = Date.now() - startTime
+		tableFooter.empty()
+		tableFooter.append(`
+			<tr class="table-primary">
+				<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
+			</tr>
+		`)
 	}
 }
 
@@ -60,7 +71,7 @@ function logAlgorithmResult(resultData) {
 }
 
 const appendNoDataFound = (workerName, algorithm, duration) => {
-	resultTableBody.append(`<tr>
+	resultTable.append(`<tr>
 			<td>${workerName}</td>
 			<td>${algorithm}</td>
 			<td>${duration} ms</td>
@@ -69,7 +80,7 @@ const appendNoDataFound = (workerName, algorithm, duration) => {
 }
 
 const appendResultData = (workerName, algorithm, duration, result) => {
-		resultTableBody.append(`<tr>
+		resultTable.append(`<tr>
 		<td>${workerName}</td>
 		<td>${algorithm}</td>
 		<td>${duration} ms</td>
