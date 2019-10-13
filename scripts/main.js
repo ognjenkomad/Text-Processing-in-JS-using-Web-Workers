@@ -9,16 +9,18 @@ const workerSelectContainer = $('#worker-select-container')
 const workerSelect = $('#worker-select')
 
 
-const students = data.students;
-const searchAlgorithms = [
-		'binary',
-		'exponential',
-		'interpolation',
-		'jump',
-		'sequential'
+array = Array.from({length: 100000}, () => Math.floor(Math.random() * 100000));
+
+const sortAlgorithms = [
+	'merge',
+	'bubble',
+	'insertion',
+	'quick',
+	'selection'
 ];
 
 let finishedAlgorithmsCount = 0;
+const numberOfAlgorithms = 5
 let totalTimeStart = 0;
 let algorithmsQueue = [];
 
@@ -40,30 +42,19 @@ processingSelect.on('change', (event) => {
 
 function findNumber() {
 	totalTimeStart = Date.now()
-	algorithmsQueue = [...searchAlgorithms];
+	algorithmsQueue = [...sortAlgorithms];
+	finishedAlgorithmsCount = 0
 	resultTable.find('tbody').empty()
-	const searchValue = parseInt(searchInput.val());
+	tableFooter.empty()
 	if (processingSelect.val() == 2) {
 		numberOfWorkers = workerSelect.val()
 		for (let i = 1; i <= numberOfWorkers; i++) {
 			const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
-			runWorker(worker, `worker_${i}`, students, searchValue);
+			runWorker(worker, `worker_${i}`, [...array]);
 		}
 	} else {
-		runAllAlgorithmsSequenital(students, searchValue)
+		runAllAlgorithmsSequenital()
 		appendTableFooter()
-	}
-}
-
-function logAlgorithmResult(resultData) {
-	const workerName = resultData.workerName.toUpperCase()
-	const algorithm = resultData.algorithm.toUpperCase()
-	const duration = resultData.duration
-	const result = resultData.result
-	if (result === -1) {
-		appendNoDataFound(workerName, algorithm, duration)
-	} else {
-		appendResultData(workerName, algorithm, duration, result)
 	}
 }
 
@@ -78,55 +69,42 @@ const appendTableFooter = () => {
 	`)
 }
 
-const appendNoDataFound = (workerName, algorithm, duration) => {
-	resultTable.append(`<tr>
-			<td>${workerName}</td>
-			<td>${algorithm}</td>
+const appentTableRow = (workerName, algorithm, duration) => {
+	resultTable.find('tbody').append(
+		`
+		<tr>
+			<td>${workerName.toUpperCase()}</td>
+			<td>${algorithm.toUpperCase()}</td>
 			<td>${duration} ms</td>
-			<td class="text-center" colspan='5'>No results found.</td>
-		</tr>`)
+		</tr>
+		`
+	)
 }
 
-const appendResultData = (workerName, algorithm, duration, result) => {
-		resultTable.append(`<tr>
-		<td>${workerName}</td>
-		<td>${algorithm}</td>
-		<td>${duration} ms</td>
-		<td>${result.index}</td>
-		<td>${result.firstName}</td>
-		<td>${result.lastName}</td>
-		<td>${result.birthPlace}</td>
-		<td>${result.age}</td>
-		</tr>`)
-}
-
-const runAllAlgorithmsSequenital = (items, searchValue) => {
-	searchAlgorithms.forEach(algorithm => {
+const runAllAlgorithmsSequenital = () => {
+	sortAlgorithms.forEach(algorithm => {
 		const startTime = Date.now()
-		const result = window[`${algorithm}Search`](items, searchValue);
-		const duration = (Date.now() - startTime)
-		if (result === -1) {
-			appendNoDataFound('-', algorithm.toUpperCase(), duration)
-		} else {
-			appendResultData('-', algorithm.toUpperCase(), duration, result)
-		}
+		window[`${algorithm}Sort`]([...array]);
+		const duration = Date.now() - startTime
+		appentTableRow('-', algorithm, duration)
 	});
 }
 
-const runWorker = (worker, workerName, items, searchValue) => {
+const runWorker = (worker, workerName, array) => {
 	let algorithm = algorithmsQueue.pop();
-	worker.postMessage({ items, algorithm, workerName, searchValue});
+	worker.postMessage({ algorithm, workerName, array });
 	worker.onmessage = event => {		
 		finishedAlgorithmsCount ++;
-		if (finishedAlgorithmsCount === 5) {
+		
+		appentTableRow(event.data.workerName, event.data.algorithm, event.data.duration)
+		if (finishedAlgorithmsCount === numberOfAlgorithms) {
 			appendTableFooter()
 		}
-		logAlgorithmResult(event.data);
 		if (algorithmsQueue.length === 0) {
-			//worker.terminate();
+			// worker.terminate();
 		} else {
 			algorithm = algorithmsQueue.pop();
-			worker.postMessage({ items, algorithm, workerName, searchValue});
+			worker.postMessage({ algorithm, workerName, array });
 		}
 	}
 };
