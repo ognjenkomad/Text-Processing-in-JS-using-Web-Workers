@@ -34,11 +34,13 @@ const setSubmitBtnProcessingState = () => {
 	submitButton.text('Processing...');
 };
 
+const generateRandomArray = (arrayLength) => {
+	randomGeneratedArray = Array.from({length: arrayLength}, () => Math.floor(Math.random() * arrayLength));
+	console.log('random generated array', randomGeneratedArray);
+};
+
 const process = () => {
 	setSubmitBtnProcessingState();
-	const randomGeneratedArrayLength = parseInt(arrayLengthRangeInput.val());
-	randomGeneratedArray = Array.from({length: randomGeneratedArrayLength}, () => Math.floor(Math.random() * randomGeneratedArrayLength));
-	console.log('random generated array', randomGeneratedArray);
 	sortAlgorithms = algorithmsSelect.val();
 	selectedAlgorithmsCount = sortAlgorithms.length;
 	algorithmsQueue = [...sortAlgorithms];
@@ -119,6 +121,8 @@ const runWorker = (worker, workerName, arrayToSort) => {
 // Events
 arrayLengthRangeInput.on('change', () => {
 	validateInputData();
+	const arrayLength = parseInt(arrayLengthRangeInput.val());
+	generateRandomArray(arrayLength);
 	arrayLengthText.text(arrayLengthRangeInput.val());
 });
 
