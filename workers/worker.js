@@ -3,27 +3,28 @@ self.onmessage = event => {
 	const arrayToSort = event.data.arrayToSort;
 	const algorithm = event.data.algorithm;
 	const startTime = Date.now();
+	let resultArray = [];
 
 	switch (algorithm) {
 		case 'bubble':
-			bubbleSort(arrayToSort);
+			resultArray = bubbleSort(arrayToSort);
 			break;
 		case 'insertion':
-			insertionSort(arrayToSort);
+			resultArray = insertionSort(arrayToSort);
 			break;
 		case 'merge':
-			mergeSort(arrayToSort);
+			resultArray = mergeSort(arrayToSort);
 			break;
 		case 'quick':
-			quickSort(arrayToSort);
+			resultArray = quickSort(arrayToSort);
 			break;
 		case 'selection':
-			selectionSort(arrayToSort);
+			resultArray = selectionSort(arrayToSort);
 			break;
 	}
 
 	const duration = Date.now() - startTime;
-
+	console.log(workerName, algorithm, resultArray);
 	self.postMessage({
 		algorithm,
 		workerName,

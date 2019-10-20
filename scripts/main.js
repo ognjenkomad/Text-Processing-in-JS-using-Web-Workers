@@ -38,6 +38,7 @@ const process = () => {
 	setSubmitBtnProcessingState();
 	const randomGeneratedArrayLength = parseInt(arrayLengthRangeInput.val());
 	randomGeneratedArray = Array.from({length: randomGeneratedArrayLength}, () => Math.floor(Math.random() * randomGeneratedArrayLength));
+	console.log('random generated array', randomGeneratedArray);
 	sortAlgorithms = algorithmsSelect.val();
 	selectedAlgorithmsCount = sortAlgorithms.length;
 	algorithmsQueue = [...sortAlgorithms];
@@ -86,8 +87,9 @@ const appendTableRow = (workerName, algorithm, duration) => {
 const runAlgorithmsSequential = () => {
 	sortAlgorithms.forEach(algorithm => {
 		const startTime = Date.now();
-		window[`${algorithm}Sort`]([...randomGeneratedArray]);
+		let resultArray = window[`${algorithm}Sort`]([...randomGeneratedArray]);
 		const duration = Date.now() - startTime;
+		console.log('sequential', algorithm, resultArray);
 		appendTableRow('-', algorithm, duration);
 	});
 };
