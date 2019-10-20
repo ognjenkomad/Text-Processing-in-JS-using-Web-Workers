@@ -1,28 +1,33 @@
-const resultTable = $('#result-table')
-const tableFooter = resultTable.find('tfoot')
+const resultTable = $('#result-table');
+const tableFooter = resultTable.find('tfoot');
 
-const submitButton = $('#submit-button')
-const searchInput = $('#search-input')
+const submitButton = $('#submit-button');
+submitButton.prop('disabled', true);
+const searchInput = $('#search-input');
 
-const processingSelect = $('#processing-select')
-const workerSelectContainer = $('#worker-select-container')
-const workerSelect = $('#worker-select')
+const numbersRange = $('#numbers-range');
+const numbersRangeText = $('#numbers-range-text');
+const processingSelect = $('#processing-select');
+const sortAlgorithmsMultiselect = $('#search-algorithms-multiselect');
+const workerSelectContainer = $('#worker-select-container');
+const workerSelect = $('#worker-select');
 
-
-array = Array.from({length: 100000}, () => Math.floor(Math.random() * 100000));
-
-const sortAlgorithms = [
-	'merge',
-	'bubble',
-	'insertion',
-	'quick',
-	'selection'
-];
+let unsortedArray = [];
+let sortAlgorithms = [];
 
 let finishedAlgorithmsCount = 0;
-const numberOfAlgorithms = 5
+let numberOfAlgorithms = 0;
 let totalTimeStart = 0;
 let algorithmsQueue = [];
+
+numbersRange.on('change', () => {
+	numbersRangeText.text(numbersRange.val());
+});
+
+sortAlgorithmsMultiselect.on('change', () => {
+	const selectedAlgorithms = sortAlgorithmsMultiselect.val();
+	submitButton.prop('disabled', selectedAlgorithms.length === 0);
+});
 
 // Events
 submitButton.on('click', findNumber)
@@ -36,12 +41,24 @@ processingSelect.on('change', (event) => {
 	} else {
 		workerSelectContainer.hide()
 	}
-})
-
-
+});
 
 function findNumber() {
-	totalTimeStart = Date.now()
+	const unsortedArrayLength = parseInt(numbersRange.val());
+	if (unsortedArrayLength === 0) {
+		alert('Choose valid array length...');
+		return false;
+	}
+	unsortedArray = Array.from({length: unsortedArrayLength}, () => Math.floor(Math.random() * unsortedArrayLength));
+	sortAlgorithms = sortAlgorithmsMultiselect.val();
+	numberOfAlgorithms = sortAlgorithms.length;
+	if (numberOfAlgorithms === 0) {
+		alert('Choose at least one sort algorithm...');
+		return false;
+	}
+	submitButton.prop('disabled', true);
+	submitButton.text('Processing...');
+	totalTimeStart = Date.now();
 	algorithmsQueue = [...sortAlgorithms];
 	finishedAlgorithmsCount = 0
 	resultTable.find('tbody').empty()
@@ -50,11 +67,13 @@ function findNumber() {
 		numberOfWorkers = workerSelect.val()
 		for (let i = 1; i <= numberOfWorkers; i++) {
 			const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
-			runWorker(worker, `worker_${i}`, [...array]);
+			runWorker(worker, `worker_${i}`, [...unsortedArray]);
 		}
 	} else {
-		runAllAlgorithmsSequenital()
+		runAlgorithmsSequential(sortAlgorithms);
 		appendTableFooter()
+		submitButton.prop('disabled', false);
+		submitButton.text('Run');
 	}
 }
 
@@ -81,10 +100,11 @@ const appentTableRow = (workerName, algorithm, duration) => {
 	)
 }
 
-const runAllAlgorithmsSequenital = () => {
-	sortAlgorithms.forEach(algorithm => {
+const runAlgorithmsSequential = algorithms => {
+	console.log('algorithms', algorithms);
+	algorithms.forEach(algorithm => {
 		const startTime = Date.now()
-		window[`${algorithm}Sort`]([...array]);
+		window[`${algorithm}Sort`]([...unsortedArray]);
 		const duration = Date.now() - startTime
 		appentTableRow('-', algorithm, duration)
 	});
@@ -92,13 +112,18 @@ const runAllAlgorithmsSequenital = () => {
 
 const runWorker = (worker, workerName, array) => {
 	let algorithm = algorithmsQueue.pop();
+	if (!algorithm) {
+		return false;
+	}
 	worker.postMessage({ algorithm, workerName, array });
 	worker.onmessage = event => {		
 		finishedAlgorithmsCount ++;
 		
 		appentTableRow(event.data.workerName, event.data.algorithm, event.data.duration)
 		if (finishedAlgorithmsCount === numberOfAlgorithms) {
-			appendTableFooter()
+			appendTableFooter();
+			submitButton.prop('disabled', false);
+			submitButton.text('Run');
 		}
 		if (algorithmsQueue.length === 0) {
 			// worker.terminate();
