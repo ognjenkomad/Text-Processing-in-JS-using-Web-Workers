@@ -23,15 +23,16 @@
         <div class="row my-2">
             <div class="col-md-6 offset-md-3">
                 <div class="form-group">
-                    <label for="numbers-range">Choose array from 0 to 100000...</label>
-                    <input type="range" class="custom-range" min="0" max="100000" step="10000" id="numbers-range"
+                    <label for="array-length-range-input">Choose array length from 0 to 100000</label>
+                    <small class="text-muted">(array of random generated integers from selected range)</small>
+                    <input type="range" class="custom-range" min="0" max="100000" step="10000" id="array-length-range-input"
                            value="0">
                     <p>
-                        Length: <span id="numbers-range-text">0</span>
+                        Length: <span id="array-length-text" class="font-weight-bold">0</span>
                     </p>
                 </div>
                 <div class="form-group">
-                    <select id="search-algorithms-multiselect" class="selectpicker form-control"
+                    <select id="algorithms-multi-select" class="selectpicker form-control"
                             title="Select sort algorithms..." data-actions-box="true" multiple required>
                         <option value="bubble">BUBBLE</option>
                         <option value="insertion">INSERTION</option>
@@ -42,16 +43,16 @@
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="processing-select">Processing Type</label>
+                        <label class="input-group-text" for="processing-type-select">Processing Type</label>
                     </div>
-                    <select class="custom-select" id="processing-select">
+                    <select class="custom-select" id="processing-type-select">
                         <option selected value="1">Sequential</option>
                         <option value="2">Parallel</option>
                     </select>
                 </div>
                 <div style="display: none;" class="input-group mb-3" id="worker-select-container">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="worker-select">Number Of Threads</label>
+                        <label class="input-group-text" for="worker-select">Number Of Workers (Threads)</label>
                     </div>
                     <select class="custom-select" id="worker-select">
                         <option selected value="1">1</option>
@@ -62,7 +63,7 @@
                     </select>
                 </div>
                 <div class="text-right">
-                    <button id="submit-button" class="btn btn-primary" type="button">Run</button>
+                    <button id="btn-submit" class="btn btn-primary" type="button" disabled>Run</button>
                 </div>
             </div>
         </div>

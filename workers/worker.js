@@ -1,28 +1,28 @@
 self.onmessage = event => {
 	const workerName = event.data.workerName;
-	const array = event.data.array;
+	const arrayToSort = event.data.arrayToSort;
 	const algorithm = event.data.algorithm;
 	const startTime = Date.now();
 
 	switch (algorithm) {
 		case 'bubble':
-			bubbleSort(array);
+			bubbleSort(arrayToSort);
 			break;
 		case 'insertion':
-			insertionSort(array);
+			insertionSort(arrayToSort);
 			break;
 		case 'merge':
-			mergeSort(array);
+			mergeSort(arrayToSort);
 			break;
 		case 'quick':
-			quickSort(array);
+			quickSort(arrayToSort);
 			break;
 		case 'selection':
-			selectionSort(array);
+			selectionSort(arrayToSort);
 			break;
 	}
 
-	const duration = (Date.now() - startTime);
+	const duration = Date.now() - startTime;
 
 	self.postMessage({
 		algorithm,
@@ -33,11 +33,11 @@ self.onmessage = event => {
 
 // Algorithms
 function bubbleSort(arr) {
-	var len = arr.length;
-	for (var i = len - 1; i >= 0; i--) {
-		for (var j = 1; j <= i; j++) {
+	let len = arr.length;
+	for (let i = len - 1; i >= 0; i--) {
+		for (let j = 1; j <= i; j++) {
 			if (arr[j - 1] > arr[j]) {
-				var temp = arr[j - 1];
+				let temp = arr[j - 1];
 				arr[j - 1] = arr[j];
 				arr[j] = temp;
 			}
@@ -47,7 +47,7 @@ function bubbleSort(arr) {
 }
 
 function insertionSort(arr) {
-	var i, len = arr.length, el, j;
+	let i, len = arr.length, el, j;
 
 	for (i = 1; i < len; i++) {
 		el = arr[i];
@@ -66,10 +66,10 @@ function insertionSort(arr) {
 
 function mergeSort(arr) {
 
-	var len = arr.length;
+	let len = arr.length;
 	if (len < 2)
 		return arr;
-	var mid = Math.floor(len / 2),
+	let mid = Math.floor(len / 2),
 		left = arr.slice(0, mid),
 		right = arr.slice(mid);
 	//send left and right to the mergeSort to broke it down into pieces
@@ -78,7 +78,7 @@ function mergeSort(arr) {
 }
 
 function merge(left, right) {
-	var result = [],
+	let result = [],
 		lLen = left.length,
 		rLen = right.length,
 		l = 0,
@@ -96,7 +96,7 @@ function merge(left, right) {
 
 function quickSort(arr, left = 0, right = arr.length - 1) {
 
-	var len = arr.length,
+	let len = arr.length,
 		pivot,
 		partitionIndex;
 
@@ -113,10 +113,10 @@ function quickSort(arr, left = 0, right = arr.length - 1) {
 }
 
 function partition(arr, pivot, left, right) {
-	var pivotValue = arr[pivot],
+	let pivotValue = arr[pivot],
 		partitionIndex = left;
 
-	for (var i = left; i < right; i++) {
+	for (let i = left; i < right; i++) {
 		if (arr[i] < pivotValue) {
 			swap(arr, i, partitionIndex);
 			partitionIndex++;
@@ -128,17 +128,17 @@ function partition(arr, pivot, left, right) {
 
 
 function swap(arr, i, j) {
-	var temp = arr[i];
+	let temp = arr[i];
 	arr[i] = arr[j];
 	arr[j] = temp;
 }
 
 function selectionSort(arr) {
-	var minIdx, temp,
+	let minIdx, temp,
 		len = arr.length;
-	for (var i = 0; i < len; i++) {
+	for (let i = 0; i < len; i++) {
 		minIdx = i;
-		for (var j = i + 1; j < len; j++) {
+		for (let j = i + 1; j < len; j++) {
 			if (arr[j] < arr[minIdx]) {
 				minIdx = j;
 			}
