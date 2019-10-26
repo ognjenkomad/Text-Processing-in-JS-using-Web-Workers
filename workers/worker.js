@@ -1,43 +1,56 @@
 self.onmessage = event => {
 	const workerName = event.data.workerName;
-	const arrayToSort = event.data.arrayToSort;
 	const algorithm = event.data.algorithm;
+
 	const startTime = Date.now();
-	let resultArray = [];
+
+	const words = textToArray(event.data.text);
+
+	let sortedWords = [];
 
 	switch (algorithm) {
 		case 'bubble':
-			resultArray = bubbleSort(arrayToSort);
+			sortedWords = bubbleSort(words);
 			break;
 		case 'insertion':
-			resultArray = insertionSort(arrayToSort);
+			sortedWords = insertionSort(words);
 			break;
 		case 'merge':
-			resultArray = mergeSort(arrayToSort);
+			sortedWords = mergeSort(words);
 			break;
 		case 'quick':
-			resultArray = quickSort(arrayToSort);
+			sortedWords = quickSort(words);
 			break;
 		case 'selection':
-			resultArray = selectionSort(arrayToSort);
+			sortedWords = selectionSort(words);
 			break;
 	}
 
 	const duration = Date.now() - startTime;
-	console.log(workerName, algorithm, resultArray);
+
 	self.postMessage({
 		algorithm,
 		workerName,
-		duration
+		duration,
+		sortedWords
 	});
 };
 
-// Algorithms
+const textToArray = text => {
+	text = text.replace(/[^A-Za-z\s]/g, "");
+	text = text.replace(/(\r\n|\n|\r)/gm, " ");
+	text = text.replace(/\s{2,}/g, " ");
+	return text.split(' ');
+};
+
+// *** SORT ALGORITHMS ***
+
+// *** BUBBLE SORT ***
 function bubbleSort(arr) {
 	let len = arr.length;
 	for (let i = len - 1; i >= 0; i--) {
 		for (let j = 1; j <= i; j++) {
-			if (arr[j - 1] > arr[j]) {
+			if (arr[j - 1].localeCompare(arr[j]) === 1) {
 				let temp = arr[j - 1];
 				arr[j - 1] = arr[j];
 				arr[j] = temp;
@@ -47,6 +60,7 @@ function bubbleSort(arr) {
 	return arr;
 }
 
+// *** INSERTION SORT ***
 function insertionSort(arr) {
 	let i, len = arr.length, el, j;
 
@@ -54,7 +68,7 @@ function insertionSort(arr) {
 		el = arr[i];
 		j = i;
 
-		while (j > 0 && arr[j - 1] > el) {
+		while (j > 0 && arr[j - 1].localeCompare(el) === 1) {
 			arr[j] = arr[j - 1];
 			j--;
 		}
@@ -65,8 +79,8 @@ function insertionSort(arr) {
 	return arr;
 }
 
+// *** MERGE SORT ***
 function mergeSort(arr) {
-
 	let len = arr.length;
 	if (len < 2)
 		return arr;
@@ -85,7 +99,7 @@ function merge(left, right) {
 		l = 0,
 		r = 0;
 	while (l < lLen && r < rLen) {
-		if (left[l] < right[r]) {
+		if (left[l].localeCompare(right[r]) === -1) {
 			result.push(left[l++]);
 		} else {
 			result.push(right[r++]);
@@ -95,12 +109,11 @@ function merge(left, right) {
 	return result.concat(left.slice(l)).concat(right.slice(r));
 }
 
+// *** QUICK SORT ***
 function quickSort(arr, left = 0, right = arr.length - 1) {
-
 	let len = arr.length,
 		pivot,
 		partitionIndex;
-
 
 	if (left < right) {
 		pivot = right;
@@ -118,7 +131,7 @@ function partition(arr, pivot, left, right) {
 		partitionIndex = left;
 
 	for (let i = left; i < right; i++) {
-		if (arr[i] < pivotValue) {
+		if (arr[i].localeCompare(pivotValue) === -1) {
 			swap(arr, i, partitionIndex);
 			partitionIndex++;
 		}
@@ -127,20 +140,20 @@ function partition(arr, pivot, left, right) {
 	return partitionIndex;
 }
 
-
 function swap(arr, i, j) {
 	let temp = arr[i];
 	arr[i] = arr[j];
 	arr[j] = temp;
 }
 
+// *** SELECTION SORT ***
 function selectionSort(arr) {
 	let minIdx, temp,
 		len = arr.length;
 	for (let i = 0; i < len; i++) {
 		minIdx = i;
 		for (let j = i + 1; j < len; j++) {
-			if (arr[j] < arr[minIdx]) {
+			if (arr[j].localeCompare(arr[minIdx]) === -1) {
 				minIdx = j;
 			}
 		}
@@ -150,3 +163,5 @@ function selectionSort(arr) {
 	}
 	return arr;
 }
+
+// *** END SORT ALGORITHMS ***

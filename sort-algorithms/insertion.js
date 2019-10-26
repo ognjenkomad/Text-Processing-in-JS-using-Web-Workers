@@ -5,11 +5,10 @@ function insertionSort(arr) {
 		el = arr[i];
 		j = i;
 
-		while (j > 0 && arr[j - 1] > el) {
+		while (j > 0 && arr[j - 1].localeCompare(el) === 1) {
 			arr[j] = arr[j - 1];
 			j--;
 		}
-
 		arr[j] = el;
 	}
 

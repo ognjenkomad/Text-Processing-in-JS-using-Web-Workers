@@ -1,3 +1,16 @@
 main {
 	margin-bottom: 80px;
 }
+
+#words-table tbody, #words-table thead {
+	display: block;
+}
+
+#words-table tbody {
+	height: 80vh;
+	overflow-y: auto;
+}
+
+#words-table tbody td, #words-table thead th {
+	width: 100%;
+}

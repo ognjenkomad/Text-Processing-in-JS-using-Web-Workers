@@ -1,5 +1,4 @@
 function mergeSort(arr) {
-
 	let len = arr.length;
 	if (len < 2)
 		return arr;
@@ -18,12 +17,12 @@ function merge(left, right) {
 		l = 0,
 		r = 0;
 	while (l < lLen && r < rLen) {
-		if (left[l] < right[r]) {
+		if (left[l].localeCompare(right[r]) === -1) {
 			result.push(left[l++]);
 		} else {
 			result.push(right[r++]);
 		}
 	}
-	//remaining part needs to be addred to the result
+	//remaining part needs to be added to the result
 	return result.concat(left.slice(l)).concat(right.slice(r));
 }

@@ -1,80 +1,85 @@
 //Declarations
-const arrayLengthRangeInput = $('#array-length-range-input');
-const arrayLengthText = $('#array-length-text');
-const processingTypeSelect = $('#processing-type-select');
-const algorithmsSelect = $('#algorithms-multi-select');
+const textArea = $('#text-for-processing');
+const processingTypeInput = $('#processing-type-input');
+const algorithmsInput = $('#algorithms-multi-select');
 const workerSelectContainer = $('#worker-select-container');
 const workerSelect = $('#worker-select');
-const submitButton = $('#btn-submit');
 const resultTable = $('#result-table');
+const wordsTable = $('#words-table');
 const resultTableFooter = resultTable.find('tfoot');
+const form = $('#text-processing-form');
+const submitButton = $('#btn-submit');
 
-let randomGeneratedArray = [];
-let sortAlgorithms = [];
+let textForProcessing = '';
+let selectedAlgorithms = [];
 let algorithmsQueue = [];
 let finishedAlgorithmsCount = 0;
 let selectedAlgorithmsCount = 0;
 let processingStartTime = 0;
+let sortedWords = [];
 
-// Functions
-const validateInputData = () => {
-	const selectedArrayLength = parseInt(arrayLengthRangeInput.val());
-	const selectedAlgorithms = algorithmsSelect.val();
-	const disableSubmitButton = selectedArrayLength === 0 || selectedAlgorithms.length === 0;
-	submitButton.prop('disabled', disableSubmitButton);
-};
-
-const setSubmitButtonDefaultState = () => {
-	submitButton.prop('disabled', false);
-	submitButton.text('Run');
-};
-
-const setSubmitBtnProcessingState = () => {
-	submitButton.prop('disabled', true);
-	submitButton.text('Processing...');
-};
-
-const generateRandomArray = (arrayLength) => {
-	randomGeneratedArray = Array.from({length: arrayLength}, () => Math.floor(Math.random() * arrayLength));
-	console.log('random generated array', randomGeneratedArray);
-};
-
-const process = () => {
-	setSubmitBtnProcessingState();
-	sortAlgorithms = algorithmsSelect.val();
-	selectedAlgorithmsCount = sortAlgorithms.length;
-	algorithmsQueue = [...sortAlgorithms];
-	finishedAlgorithmsCount = 0;
+const onFormSubmit = () => {
+	disableSubmitButton();
+	wordsTable.find('tbody').empty();
 	resultTable.find('tbody').empty();
 	resultTableFooter.empty();
+	selectedAlgorithms = algorithmsInput.val();
+	selectedAlgorithmsCount = selectedAlgorithms.length;
+	algorithmsQueue = [...selectedAlgorithms];
+	finishedAlgorithmsCount = 0;
+	textForProcessing = textArea.val();
 	processingStartTime = Date.now();
-	if (parseInt(processingTypeSelect.val()) === 2) {
-		runAlgorithmsUsingWorkers();
-	} else {
-		runAlgorithmsSequential();
-		appendTableFooter();
-		setSubmitButtonDefaultState();
-	}
+	processingTypeInput.val() === '2' ? runAlgorithmsUsingWorkers() : runAlgorithmsSequential();
 };
 
-const runAlgorithmsUsingWorkers = () => {
-	for (let i = 1; i <= workerSelect.val(); i++) {
-		const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
-		runWorker(worker, `worker_${i}`, [...randomGeneratedArray]);
-	}
+const disableSubmitButton = () => {
+	submitButton.text('Processing...');
+	submitButton.prop('disabled', true);
 };
 
-const appendTableFooter = () => {
-	const duration = Date.now() - processingStartTime;
-	resultTableFooter.empty();
-	resultTableFooter.append(`
-		<tr class="table-primary">
-			<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
+const enableSubmitButton = () => {
+	submitButton.text('Run');
+	submitButton.prop('disabled', false);
+};
+
+const textToArray = text => {
+	text = text.replace(/[^A-Za-z\s]/g, "");
+	text = text.replace(/(\r\n|\n|\r)/gm, " ");
+	text = text.replace(/\s{2,}/g, " ");
+	return text.split(' ');
+};
+
+const arrayUnique = array => {
+	return array.filter(function (item, index) {
+		return array.indexOf(item) >= index;
+	});
+};
+
+const countWords = text => {
+	let words = textToArray(text);
+	let counts = {};
+	words.forEach(function (x) {
+		counts[x] = (counts[x] || 0) + 1;
+	});
+	return counts;
+};
+
+const appendWordsTableRow = sortedWords => {
+	let uniqueWords = arrayUnique(sortedWords);
+	let counts = countWords(textForProcessing);
+	uniqueWords.forEach(value => {
+		wordsTable.find('tbody').append(
+			`
+		<tr>
+			<td class="text-center">${value}</td>
+			<td class="text-center" style="min-width: 100px;">${counts[value]}</td>
 		</tr>
-	`)
+		`
+		);
+	});
 };
 
-const appendTableRow = (workerName, algorithm, duration) => {
+const appendResultTableRow = (workerName, algorithm, duration) => {
 	resultTable.find('tbody').append(
 		`
 		<tr>
@@ -86,55 +91,62 @@ const appendTableRow = (workerName, algorithm, duration) => {
 	)
 };
 
-const runAlgorithmsSequential = () => {
-	sortAlgorithms.forEach(algorithm => {
-		const startTime = Date.now();
-		let resultArray = window[`${algorithm}Sort`]([...randomGeneratedArray]);
-		const duration = Date.now() - startTime;
-		console.log('sequential', algorithm, resultArray);
-		appendTableRow('-', algorithm, duration);
-	});
+const appendResultTableFooter = () => {
+	const duration = Date.now() - processingStartTime;
+	resultTableFooter.empty();
+	resultTableFooter.append(`
+		<tr class="table-primary">
+			<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
+		</tr>
+	`)
 };
 
-const runWorker = (worker, workerName, arrayToSort) => {
+const runAlgorithmsSequential = () => {
+	selectedAlgorithms.forEach(algorithm => {
+		const startTime = Date.now();
+		let words = textToArray(textForProcessing);
+		sortedWords = window[`${algorithm}Sort`](words);
+		const duration = Date.now() - startTime;
+		appendResultTableRow('-', algorithm, duration);
+	});
+	appendResultTableFooter();
+	appendWordsTableRow(sortedWords);
+	enableSubmitButton();
+};
+
+const runAlgorithmsUsingWorkers = () => {
+	for (let i = 1; i <= workerSelect.val(); i++) {
+		const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
+		runWorker(worker, `worker_${i}`, textForProcessing);
+	}
+};
+
+const runWorker = (worker, workerName, text) => {
 	let algorithm = algorithmsQueue.pop();
 	if (!algorithm) {
 		return false;
 	}
-	worker.postMessage({algorithm, workerName, arrayToSort});
+	worker.postMessage({algorithm, workerName, text});
 	worker.onmessage = event => {
 		finishedAlgorithmsCount++;
-		appendTableRow(event.data.workerName, event.data.algorithm, event.data.duration);
+		appendResultTableRow(event.data.workerName, event.data.algorithm, event.data.duration);
 		if (finishedAlgorithmsCount === selectedAlgorithmsCount) {
-			appendTableFooter();
-			setSubmitButtonDefaultState();
+			appendResultTableFooter();
+			appendWordsTableRow(event.data.sortedWords);
+			enableSubmitButton();
 		}
 		if (algorithmsQueue.length === 0) {
 			// worker.terminate();
 		} else {
 			algorithm = algorithmsQueue.pop();
-			worker.postMessage({algorithm, workerName, arrayToSort});
+			worker.postMessage({algorithm, workerName, text});
 		}
 	}
 };
 
-// Events
-arrayLengthRangeInput.on('change', () => {
-	validateInputData();
-	const arrayLength = parseInt(arrayLengthRangeInput.val());
-	generateRandomArray(arrayLength);
-	arrayLengthText.text(arrayLengthRangeInput.val());
+processingTypeInput.on('change', event => {
+	event.target.value === '2' ? workerSelectContainer.show() : workerSelectContainer.hide();
 });
 
-algorithmsSelect.on('change', validateInputData);
-
-submitButton.on('click', process);
-
-processingTypeSelect.on('change', () => {
-	if (parseInt(processingTypeSelect.val()) === 2) {
-		workerSelectContainer.show();
-		return true;
-	}
-	workerSelectContainer.hide();
-});
+form.on('submit', onFormSubmit);
 

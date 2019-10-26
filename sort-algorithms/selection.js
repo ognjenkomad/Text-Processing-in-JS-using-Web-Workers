@@ -4,7 +4,7 @@ function selectionSort(arr) {
 	for (let i = 0; i < len; i++) {
 		minIdx = i;
 		for (let j = i + 1; j < len; j++) {
-			if (arr[j] < arr[minIdx]) {
+			if (arr[j].localeCompare(arr[minIdx]) === -1) {
 				minIdx = j;
 			}
 		}

@@ -1,5 +1,4 @@
 function quickSort(arr, left = 0, right = arr.length - 1) {
-
 	let len = arr.length,
 		pivot,
 		partitionIndex;
@@ -20,7 +19,7 @@ function partition(arr, pivot, left, right) {
 		partitionIndex = left;
 
 	for (let i = left; i < right; i++) {
-		if (arr[i] < pivotValue) {
+		if (arr[i].localeCompare(pivotValue) === -1) {
 			swap(arr, i, partitionIndex);
 			partitionIndex++;
 		}

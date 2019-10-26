@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Sequential and Parallel Programming in JS using Web Workers</title>
+    <title>Text Processing in JS using Web Workers</title>
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -14,67 +14,80 @@
 
 <header>
     <nav class="navbar navbar-dark sticky-top bg-dark">
-        <a class="navbar-brand" href="/">Sequential and Parallel Programming in JS using Web Workers</a>
+        <a class="navbar-brand" href="/">Text Processing in JS using Web Workers</a>
     </nav>
 </header>
 
 <main>
     <div class="container-fluid my-3">
         <div class="row my-2">
-            <div class="col-md-6 offset-md-3">
-                <div class="form-group">
-                    <label for="array-length-range-input">Choose array length from 0 to 100000</label>
-                    <small class="text-muted">(array of random generated integers from selected range)</small>
-                    <input type="range" class="custom-range" min="0" max="100000" step="10000" id="array-length-range-input"
-                           value="0">
-                    <p>
-                        Length: <span id="array-length-text" class="font-weight-bold">0</span>
-                    </p>
-                </div>
-                <div class="form-group">
-                    <select id="algorithms-multi-select" class="selectpicker form-control"
-                            title="Select sort algorithms..." data-actions-box="true" multiple required>
-                        <option value="bubble">BUBBLE</option>
-                        <option value="insertion">INSERTION</option>
-                        <option value="merge">MERGE</option>
-                        <option value="quick">QUICK</option>
-                        <option value="selection">SELECTION</option>
-                    </select>
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="processing-type-select">Processing Type</label>
+            <div class="col-md-4">
+                <form id="text-processing-form" action="javascript:void(0)" method="post">
+                    <div class="form-group">
+                        <textarea class="form-control"
+                                  id="text-for-processing"
+                                  rows="5"
+                                  placeholder="Enter your text here..."
+                                  required></textarea>
                     </div>
-                    <select class="custom-select" id="processing-type-select">
-                        <option selected value="1">Sequential</option>
-                        <option value="2">Parallel</option>
-                    </select>
-                </div>
-                <div style="display: none;" class="input-group mb-3" id="worker-select-container">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="worker-select">Number Of Workers (Threads)</label>
+                    <div class="form-group">
+                        <select id="algorithms-multi-select"
+                                class="selectpicker form-control"
+                                title="Select sort algorithms..."
+                                data-actions-box="true"
+                                multiple required>
+                            <option value="bubble">BUBBLE</option>
+                            <option value="insertion">INSERTION</option>
+                            <option value="merge">MERGE</option>
+                            <option value="quick">QUICK</option>
+                            <option value="selection">SELECTION</option>
+                        </select>
                     </div>
-                    <select class="custom-select" id="worker-select">
-                        <option selected value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <div class="text-right">
-                    <button id="btn-submit" class="btn btn-primary" type="button" disabled>Run</button>
-                </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="processing-type-input">Processing Type</label>
+                        </div>
+                        <select class="custom-select" id="processing-type-input" required>
+                            <option selected value="1">Sequential</option>
+                            <option value="2">Parallel</option>
+                        </select>
+                    </div>
+                    <div style="display: none;" class="input-group mb-3" id="worker-select-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="worker-select">Number Of Workers</label>
+                        </div>
+                        <select class="custom-select" id="worker-select">
+                            <option selected value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="text-right">
+                        <button id="btn-submit" class="btn btn-primary" type="submit">Run</button>
+                    </div>
+                </form>
             </div>
-        </div>
-        <div class="row my-3">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-4">
                 <table id="result-table" class="table table-hover">
                     <thead>
                     <tr>
                         <th scope="col">Worker</th>
                         <th scope="col">Algorithm</th>
                         <th scope="col">Time</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot></tfoot>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <table id="words-table" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Word</th>
+                        <th scope="col" class="text-center">Repetitions</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
