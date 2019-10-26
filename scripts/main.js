@@ -1,133 +1,152 @@
-const resultTable = $('#result-table')
-const tableFooter = resultTable.find('tfoot')
+//Declarations
+const textArea = $('#text-for-processing');
+const processingTypeInput = $('#processing-type-input');
+const algorithmsInput = $('#algorithms-multi-select');
+const workerSelectContainer = $('#worker-select-container');
+const workerSelect = $('#worker-select');
+const resultTable = $('#result-table');
+const wordsTable = $('#words-table');
+const resultTableFooter = resultTable.find('tfoot');
+const form = $('#text-processing-form');
+const submitButton = $('#btn-submit');
 
-const submitButton = $('#submit-button')
-const searchInput = $('#search-input')
-
-const processingSelect = $('#processing-select')
-const workerSelectContainer = $('#worker-select-container')
-const workerSelect = $('#worker-select')
-
-
-const students = data.students;
-const searchAlgorithms = [
-		'binary',
-		'exponential',
-		'interpolation',
-		'jump',
-		'sequential'
-];
-
-let finishedAlgorithmsCount = 0;
-let totalTimeStart = 0;
+let textForProcessing = '';
+let selectedAlgorithms = [];
 let algorithmsQueue = [];
+let finishedAlgorithmsCount = 0;
+let selectedAlgorithmsCount = 0;
+let processingStartTime = 0;
+let sortedWords = [];
 
-// Events
-submitButton.on('click', findNumber)
-searchInput.on('keypress', (event) => {
-	if(event.which == 13) findNumber()
-})
+const onFormSubmit = () => {
+	disableSubmitButton();
+	wordsTable.find('tbody').empty();
+	resultTable.find('tbody').empty();
+	resultTableFooter.empty();
+	selectedAlgorithms = algorithmsInput.val();
+	selectedAlgorithmsCount = selectedAlgorithms.length;
+	algorithmsQueue = [...selectedAlgorithms];
+	finishedAlgorithmsCount = 0;
+	textForProcessing = textArea.val();
+	processingStartTime = Date.now();
+	processingTypeInput.val() === '2' ? runAlgorithmsUsingWorkers() : runAlgorithmsSequential();
+};
 
-processingSelect.on('change', (event) => {
-	if (processingSelect.val() == 2) {
-		workerSelectContainer.show()
-	} else {
-		workerSelectContainer.hide()
-	}
-})
+const disableSubmitButton = () => {
+	submitButton.text('Processing...');
+	submitButton.prop('disabled', true);
+};
 
+const enableSubmitButton = () => {
+	submitButton.text('Run');
+	submitButton.prop('disabled', false);
+};
 
+const textToArray = text => {
+	text = text.replace(/[^A-Za-z\s]/g, "");
+	text = text.replace(/(\r\n|\n|\r)/gm, " ");
+	text = text.replace(/\s{2,}/g, " ");
+	return text.split(' ');
+};
 
-function findNumber() {
-	totalTimeStart = Date.now()
-	algorithmsQueue = [...searchAlgorithms];
-	resultTable.find('tbody').empty()
-	const searchValue = parseInt(searchInput.val());
-	if (processingSelect.val() == 2) {
-		numberOfWorkers = workerSelect.val()
-		for (let i = 1; i <= numberOfWorkers; i++) {
-			const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
-			runWorker(worker, `worker_${i}`, students, searchValue);
-		}
-	} else {
-		runAllAlgorithmsSequenital(students, searchValue)
-		appendTableFooter()
-	}
-}
+const arrayUnique = array => {
+	return array.filter(function (item, index) {
+		return array.indexOf(item) >= index;
+	});
+};
 
-function logAlgorithmResult(resultData) {
-	const workerName = resultData.workerName.toUpperCase()
-	const algorithm = resultData.algorithm.toUpperCase()
-	const duration = resultData.duration
-	const result = resultData.result
-	if (result === -1) {
-		appendNoDataFound(workerName, algorithm, duration)
-	} else {
-		appendResultData(workerName, algorithm, duration, result)
-	}
-}
+const countWords = text => {
+	let words = textToArray(text);
+	let counts = {};
+	words.forEach(function (x) {
+		counts[x] = (counts[x] || 0) + 1;
+	});
+	return counts;
+};
 
-const appendTableFooter = () => {
-	const duration = Date.now() - totalTimeStart
+const appendWordsTableRow = sortedWords => {
+	let uniqueWords = arrayUnique(sortedWords);
+	let counts = countWords(textForProcessing);
+	uniqueWords.forEach(value => {
+		wordsTable.find('tbody').append(
+			`
+		<tr>
+			<td class="text-center">${value}</td>
+			<td class="text-center" style="min-width: 100px;">${counts[value]}</td>
+		</tr>
+		`
+		);
+	});
+};
 
-	tableFooter.empty()
-	tableFooter.append(`
+const appendResultTableRow = (workerName, algorithm, duration) => {
+	resultTable.find('tbody').append(
+		`
+		<tr>
+			<td>${workerName.toUpperCase()}</td>
+			<td>${algorithm.toUpperCase()}</td>
+			<td>${duration} ms</td>
+		</tr>
+		`
+	)
+};
+
+const appendResultTableFooter = () => {
+	const duration = Date.now() - processingStartTime;
+	resultTableFooter.empty();
+	resultTableFooter.append(`
 		<tr class="table-primary">
 			<td colspan="8" class="text-right"><b>Total Time:</b> ${duration} ms</td>
 		</tr>
 	`)
-}
+};
 
-const appendNoDataFound = (workerName, algorithm, duration) => {
-	resultTable.append(`<tr>
-			<td>${workerName}</td>
-			<td>${algorithm}</td>
-			<td>${duration} ms</td>
-			<td class="text-center" colspan='5'>No results found.</td>
-		</tr>`)
-}
-
-const appendResultData = (workerName, algorithm, duration, result) => {
-		resultTable.append(`<tr>
-		<td>${workerName}</td>
-		<td>${algorithm}</td>
-		<td>${duration} ms</td>
-		<td>${result.index}</td>
-		<td>${result.firstName}</td>
-		<td>${result.lastName}</td>
-		<td>${result.birthPlace}</td>
-		<td>${result.age}</td>
-		</tr>`)
-}
-
-const runAllAlgorithmsSequenital = (items, searchValue) => {
-	searchAlgorithms.forEach(algorithm => {
-		const startTime = Date.now()
-		const result = window[`${algorithm}Search`](items, searchValue);
-		const duration = (Date.now() - startTime)
-		if (result === -1) {
-			appendNoDataFound('-', algorithm.toUpperCase(), duration)
-		} else {
-			appendResultData('-', algorithm.toUpperCase(), duration, result)
-		}
+const runAlgorithmsSequential = () => {
+	selectedAlgorithms.forEach(algorithm => {
+		const startTime = Date.now();
+		let words = textToArray(textForProcessing);
+		sortedWords = window[`${algorithm}Sort`](words);
+		const duration = Date.now() - startTime;
+		appendResultTableRow('-', algorithm, duration);
 	});
-}
+	appendResultTableFooter();
+	appendWordsTableRow(sortedWords);
+	enableSubmitButton();
+};
 
-const runWorker = (worker, workerName, items, searchValue) => {
+const runAlgorithmsUsingWorkers = () => {
+	for (let i = 1; i <= workerSelect.val(); i++) {
+		const worker = new Worker(`../workers/worker.js?name=Worker${i}`);
+		runWorker(worker, `worker_${i}`, textForProcessing);
+	}
+};
+
+const runWorker = (worker, workerName, text) => {
 	let algorithm = algorithmsQueue.pop();
-	worker.postMessage({ items, algorithm, workerName, searchValue});
-	worker.onmessage = event => {		
-		finishedAlgorithmsCount ++;
-		if (finishedAlgorithmsCount === 5) {
-			appendTableFooter()
+	if (!algorithm) {
+		return false;
+	}
+	worker.postMessage({algorithm, workerName, text});
+	worker.onmessage = event => {
+		finishedAlgorithmsCount++;
+		appendResultTableRow(event.data.workerName, event.data.algorithm, event.data.duration);
+		if (finishedAlgorithmsCount === selectedAlgorithmsCount) {
+			appendResultTableFooter();
+			appendWordsTableRow(event.data.sortedWords);
+			enableSubmitButton();
 		}
-		logAlgorithmResult(event.data);
 		if (algorithmsQueue.length === 0) {
-			//worker.terminate();
+			// worker.terminate();
 		} else {
 			algorithm = algorithmsQueue.pop();
-			worker.postMessage({ items, algorithm, workerName, searchValue});
+			worker.postMessage({algorithm, workerName, text});
 		}
 	}
 };
+
+processingTypeInput.on('change', event => {
+	event.target.value === '2' ? workerSelectContainer.show() : workerSelectContainer.hide();
+});
+
+form.on('submit', onFormSubmit);
 
