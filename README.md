@@ -7,4 +7,5 @@
 # Start Application
 run `live-server` in project root directory
 
-Good luck and enjoy our application!
+That's all!
+Good luck & enjoy our little application which is example of using web workers with JavaScript!
