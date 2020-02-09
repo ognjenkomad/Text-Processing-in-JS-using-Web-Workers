@@ -1,4 +1,4 @@
-# web-workers
+# Text Processing in JS using Web Workers
 
 # Installation
 Necessary: npm, nodejs
