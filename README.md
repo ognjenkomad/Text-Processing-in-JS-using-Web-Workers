@@ -1,10 +1,10 @@
 # Text Processing in JS using Web Workers
 
 # Installation
-Necessary: npm, nodejs
-
-Install Live Server:
-`npm install -g live-server`
+1. Install https://nodejs.org/en/
+2. Install npm package Live Server `npm install -g live-server`
 
 # Start Application
 run `live-server` in project root directory
+
+Good luck and enjoy our application!
